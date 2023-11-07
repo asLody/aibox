@@ -1,0 +1,7 @@
+add_library(rknn SHARED IMPORTED GLOBAL)
+if (ANDROID)
+    set_target_properties(rknn PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/android/librknnrt.so)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set_target_properties(rknn PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/linux/librknnrt.so)
+endif()
+target_include_directories(rknn INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
