@@ -1,2 +1,2 @@
-adb push ../build/app/aibox /data/local/tmp
-adb push boot.sh /data/local/tmp
+if [ "$(id -u)" -ne 0 ]; then echo "Please run as root." >&2; exit 1; fi
+./aibox
