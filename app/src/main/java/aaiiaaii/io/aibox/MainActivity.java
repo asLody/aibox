@@ -3,6 +3,7 @@ package aaiiaaii.io.aibox;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import aaiiaaii.io.aibox.databinding.ActivityMainBinding;
@@ -28,9 +29,26 @@ public class MainActivity extends AppCompatActivity {
         tv.setText(stringFromJNI());
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (hasFocus) {
+            View gameView = binding.getRoot();
+            gameView.requestPointerCapture();
+            gameView.setFocusable(true);
+            gameView.setOnCapturedPointerListener((view, motionEvent) -> {
+                mouseEvent(motionEvent.getX(), motionEvent.getY(), motionEvent.getActionButton());
+                return true;
+            });
+        }
+    }
+
     /**
      * A native method that is implemented by the 'aibox' native library,
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+    public native void mouseEvent(float x, float y, int action);
 }
