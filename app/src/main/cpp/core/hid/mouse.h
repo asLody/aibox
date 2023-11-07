@@ -27,6 +27,8 @@ class Mouse {
 public:
     Mouse() = default;
 
+    ~Mouse();
+
     static MouseConfig GetDefaultConfig();
 
     void SetConfig(const MouseConfig &config_) {
@@ -37,7 +39,9 @@ public:
         return config;
     }
 
-    void Attach(int fd);
+    void Open(const std::string &dev);
+
+    void Close();
 
     std::vector<char> GetReportDescriptor() const;
 

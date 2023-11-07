@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include "core/hid/mouse.h"
 
 namespace aibox::hid {
@@ -16,9 +17,21 @@ MouseConfig Mouse::GetDefaultConfig() {
     };
 }
 
-void Mouse::Attach(int fd) {
-    hid_fd = fd;
+
+void Mouse::Open(const std::string &dev) {
+    hid_fd = open(dev.c_str(), O_RDWR);
+    if (hid_fd < 0) {
+        throw std::runtime_error("Error opening HID device");
+    }
 }
+
+void Mouse::Close() {
+    if (hid_fd >= 0) {
+        close(hid_fd);
+        hid_fd = -1;
+    }
+}
+
 
 std::vector<char> Mouse::GetReportDescriptor() const {
     return {
@@ -89,5 +102,8 @@ bool Mouse::SendReport() {
     return write(hid_fd, &report, sizeof(report)) == sizeof(report);
 }
 
+Mouse::~Mouse() {
+    Close();
+}
 
 }
