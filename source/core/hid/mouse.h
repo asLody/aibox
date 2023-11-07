@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace aibox::hid {
 
-struct __attribute__ ((packed)) MouseReport {
+struct __attribute__((packed)) MouseReport {
     uint8_t buttons;
     int16_t x;
     int16_t y;
@@ -31,15 +31,11 @@ public:
 
     static MouseConfig GetDefaultConfig();
 
-    void SetConfig(const MouseConfig &config_) {
-        config = config_;
-    }
+    void SetConfig(const MouseConfig& config_) { config = config_; }
 
-    MouseConfig GetConfig() const {
-        return config;
-    }
+    MouseConfig GetConfig() const { return config; }
 
-    void Open(const std::string &dev);
+    void Open(const std::string& dev);
 
     void Close();
 
@@ -59,4 +55,4 @@ private:
     int8_t wheel_y{};
 };
 
-}
+}  // namespace aibox::hid

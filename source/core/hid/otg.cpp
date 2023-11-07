@@ -1,18 +1,20 @@
 #include <linux/usb/ch9.h>
-#include <usbg/usbg.h>
 #include <usbg/function/hid.h>
+#include <usbg/usbg.h>
 #include "core/hid/otg.h"
 
 namespace aibox::hid {
 
 OTGDaemon::OTGDaemon() : mouse(std::make_shared<Mouse>()) {}
 
+OTGDaemon::~OTGDaemon() = default;
+
 void OTGDaemon::Start() {
     int ret = usbg_init("/sys/kernel/config", &u_state);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error on USB gadget init");
     }
-    const auto &config = mouse->GetConfig();
+    const auto& config = mouse->GetConfig();
     usbg_gadget_attrs g_attrs = {
             .bDeviceClass = USB_CLASS_PER_INTERFACE,
             .bDeviceSubClass = 0x00,
@@ -23,25 +25,26 @@ void OTGDaemon::Start() {
             .bcdDevice = config.device_version,
     };
     struct usbg_gadget_strs g_strs = {
-            .manufacturer = const_cast<char *>(config.manufacturer.c_str()),
-            .product = const_cast<char *>(config.product.c_str()),
-            .serial = const_cast<char *>(config.serial.c_str()),
+            .manufacturer = const_cast<char*>(config.manufacturer.c_str()),
+            .product = const_cast<char*>(config.product.c_str()),
+            .serial = const_cast<char*>(config.serial.c_str()),
     };
     struct usbg_config_strs c_strs = {
-            .configuration = const_cast<char *>(config.configuration.c_str()),
+            .configuration = const_cast<char*>(config.configuration.c_str()),
     };
     const auto report_desc = mouse->GetReportDescriptor();
     struct usbg_f_hid_attrs f_attrs = {
             .protocol = 0,
-            .report_desc = {
-                    .desc = const_cast<char *>(report_desc.data()),
-                    .len = static_cast<unsigned int>(report_desc.size()),
-            },
+            .report_desc =
+                    {
+                            .desc = const_cast<char*>(report_desc.data()),
+                            .len = static_cast<unsigned int>(report_desc.size()),
+                    },
             .report_length = 6,
             .subclass = 0,
     };
-    usbg_function *u_function{};
-    usbg_config *u_config{};
+    usbg_function* u_function{};
+    usbg_config* u_config{};
 
     ret = usbg_create_gadget(u_state, "g2", &g_attrs, &g_strs, &u_gadget);
     if (ret != USBG_SUCCESS) {
@@ -70,4 +73,4 @@ void OTGDaemon::Stop() {
     usbg_cleanup(u_state);
 }
 
-}
+}  // namespace aibox::hid

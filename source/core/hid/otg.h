@@ -10,18 +10,18 @@ class OTGDaemon {
 public:
     OTGDaemon();
 
+    ~OTGDaemon();
+
     void Start();
 
     void Stop();
 
-    Mouse *GetMouse() const {
-        return mouse.get();
-    }
+    Mouse* GetMouse() const { return mouse.get(); }
 
 private:
     std::shared_ptr<Mouse> mouse;
-    usbg_state *u_state{};
-    usbg_gadget *u_gadget{};
+    usbg_state* u_state{};
+    usbg_gadget* u_gadget{};
 };
 
-}
+}  // namespace aibox::hid
