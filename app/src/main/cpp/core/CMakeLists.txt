@@ -6,4 +6,4 @@ add_library(core STATIC
         hid/otg.cpp
         hid/otg.h)
 
-target_link_libraries(core libusbgx)
+target_link_libraries(core libusbgx rknn)
