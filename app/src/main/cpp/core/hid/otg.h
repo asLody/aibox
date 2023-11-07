@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <usbg/usbg.h>
 #include "core/hid/mouse.h"
 
 namespace aibox::hid {
