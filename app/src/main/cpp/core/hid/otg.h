@@ -9,13 +9,18 @@ class OTGDaemon {
 public:
     OTGDaemon();
 
-private:
-    std::shared_ptr<Mouse> mouse;
-    usbg_state *u_state{};
-
     void Start();
 
     void Stop();
+
+    Mouse *GetMouse() const {
+        return mouse.get();
+    }
+
+private:
+    std::shared_ptr<Mouse> mouse;
+    usbg_state *u_state{};
+    usbg_gadget *u_gadget{};
 };
 
 }
