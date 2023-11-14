@@ -1,6 +1,7 @@
 #include <linux/usb/ch9.h>
 #include <usbg/function/hid.h>
 #include <usbg/usbg.h>
+
 #include "core/hid/otg.h"
 
 namespace aibox::hid {
@@ -10,12 +11,13 @@ OTGDaemon::OTGDaemon() : mouse(std::make_shared<Mouse>()) {}
 OTGDaemon::~OTGDaemon() = default;
 
 void OTGDaemon::Start() {
-    int ret = usbg_init("/sys/kernel/config", &u_state);
+    int ret = usbg_init("/config", &u_state);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error on USB gadget init");
     }
     const auto& config = mouse->GetConfig();
-    usbg_gadget_attrs g_attrs = {
+    const usbg_gadget_attrs g_attrs = {
+            .bcdUSB = 0x0200,
             .bDeviceClass = USB_CLASS_PER_INTERFACE,
             .bDeviceSubClass = 0x00,
             .bDeviceProtocol = 0x00,
@@ -46,7 +48,21 @@ void OTGDaemon::Start() {
     usbg_function* u_function{};
     usbg_config* u_config{};
 
-    ret = usbg_create_gadget(u_state, "g2", &g_attrs, &g_strs, &u_gadget);
+    const char* gadget_name = "aibox";
+
+    // Disable all gadgets first.
+    usbg_gadget* exist_gadget;
+    usbg_for_each_gadget(exist_gadget, u_state) {
+        const char* name = usbg_get_gadget_name(exist_gadget);
+        if (!strcmp(name, gadget_name)) {
+            usbg_rm_gadget(exist_gadget, USBG_RM_RECURSE);
+        } else {
+            usbg_disable_gadget(exist_gadget);
+        }
+    }
+
+    // Start creating our gadget.
+    ret = usbg_create_gadget(u_state, gadget_name, &g_attrs, &g_strs, &u_gadget);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error creating gadget");
     }
@@ -54,7 +70,7 @@ void OTGDaemon::Start() {
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error creating function");
     }
-    ret = usbg_create_config(u_gadget, 1, "config.1", nullptr, &c_strs, &u_config);
+    ret = usbg_create_config(u_gadget, 1, nullptr, nullptr, &c_strs, &u_config);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error creating config");
     }
@@ -62,13 +78,14 @@ void OTGDaemon::Start() {
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error adding function to config");
     }
-    ret = usbg_enable_gadget(u_gadget, DEFAULT_UDC);
+    ret = usbg_enable_gadget(u_gadget, nullptr);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error enabling gadget");
     }
+    printf("Active usb gadget success!\n");
 }
 
-void OTGDaemon::Stop() {
+void OTGDaemon::Stop() const {
     usbg_disable_gadget(u_gadget);
     usbg_cleanup(u_state);
 }

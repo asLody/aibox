@@ -13,12 +13,12 @@ MouseConfig Mouse::GetDefaultConfig() {
             .serial = "CAFEBABE",
             .configuration = "1xMouse",
             .max_power = 250,
-            .device_version = 0x200,
+            .device_version = 0x201,
     };
 }
 
 void Mouse::Open(const std::string& dev) {
-    hid_fd = open(dev.c_str(), O_RDWR);
+    hid_fd = open(dev.c_str(), O_RDWR, 0666);
     if (hid_fd < 0) {
         throw std::runtime_error("Error opening HID device");
     }

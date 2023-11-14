@@ -14,7 +14,7 @@ public:
 
     void Start();
 
-    void Stop();
+    void Stop() const;
 
     Mouse* GetMouse() const { return mouse.get(); }
 

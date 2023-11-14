@@ -510,7 +510,10 @@ static int usbg_parse_functions(const char *path, usbg_gadget *g)
 				else
 					ret = USBG_ERROR_NO_MEM;
 			}
-		}
+		} else {
+            // skip unknown function type
+            ret = USBG_SUCCESS;
+        }
 		free(dent[i]);
 	}
 	free(dent);
@@ -1253,7 +1256,7 @@ int usbg_rm_config(usbg_config *c, int opts)
 	g = c->parent;
 
 	if (opts & USBG_RM_RECURSE) {
-		/* 
+		/*
 		 * Recursive flag was given
 		 * so remove all bindings and strings
 		 */
@@ -2088,6 +2091,7 @@ int usbg_create_function(usbg_gadget *g, usbg_function_type type,
 
 	ret = mkdir(fpath, S_IRWXU | S_IRWXG | S_IRWXO);
 	if (ret) {
+	    fprintf(stderr, "mkdir %s ret: %d %s\n", fpath, ret, strerror(errno));
 		ret = usbg_translate_error(errno);
 		goto free_func;
 	}
