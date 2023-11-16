@@ -1,4 +1,5 @@
 #include <cstring>
+#include <stdexcept>
 #include <linux/usb/ch9.h>
 #include <usbg/function/hid.h>
 #include <usbg/usbg.h>
