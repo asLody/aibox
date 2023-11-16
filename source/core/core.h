@@ -4,10 +4,10 @@
 
 namespace aibox {
 
-namespace hid {
-class OTGDaemon;
+namespace usb {
+class UsbGadget;
 class Mouse;
-}  // namespace hid
+}  // namespace usb
 
 class Core {
 public:
@@ -17,10 +17,10 @@ public:
 
     void StartSystem();
 
-    hid::Mouse* GetMouse() const;
+    usb::UsbGadget *GetUsbGadget();
 
 private:
-    std::unique_ptr<hid::OTGDaemon> otg_daemon;
+    std::unique_ptr<usb::UsbGadget> gadget;
 };
 
 }  // namespace aibox

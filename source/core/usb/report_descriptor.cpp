@@ -1,37 +1,8 @@
-#include <fcntl.h>
-#include <unistd.h>
-#include "core/hid/mouse.h"
+#include "core/usb/report_descriptor.h"
 
-namespace aibox::hid {
+namespace aibox::usb {
 
-MouseConfig Mouse::GetDefaultConfig() {
-    return {
-            .vendor_id = 0x1D6B,
-            .product_id = 0x0104,
-            .manufacturer = "AIBOX",
-            .product = "AIBOX Mouse",
-            .serial = "CAFEBABE",
-            .configuration = "1xMouse",
-            .max_power = 250,
-            .device_version = 0x201,
-    };
-}
-
-void Mouse::Open(const std::string& dev) {
-    hid_fd = open(dev.c_str(), O_RDWR, 0666);
-    if (hid_fd < 0) {
-        throw std::runtime_error("Error opening HID device");
-    }
-}
-
-void Mouse::Close() {
-    if (hid_fd >= 0) {
-        close(hid_fd);
-        hid_fd = -1;
-    }
-}
-
-std::vector<char> Mouse::GetReportDescriptor() const {
+std::vector<char> ReportDescriptor::GetBytes() const {
     return {
             // Absolute mouse
             0x05,
@@ -105,30 +76,6 @@ std::vector<char> Mouse::GetReportDescriptor() const {
     };
 }
 
-void Mouse::MoveTo(int16_t x, int16_t y) {
-    cur_x = x;
-    cur_y = y;
-    SendReport();
-}
+uint32_t ReportDescriptor::GetReportLength() const { return 6; }
 
-void Mouse::MoveWheel(int8_t y) {
-    wheel_y = y;
-    SendReport();
-}
-
-bool Mouse::SendReport() {
-    if (hid_fd < 0) {
-        return false;
-    }
-    MouseReport report = {
-            .buttons = pressed_buttons,
-            .x = cur_x,
-            .y = cur_y,
-            .wheel = wheel_y,
-    };
-    return write(hid_fd, &report, sizeof(report)) == sizeof(report);
-}
-
-Mouse::~Mouse() { Close(); }
-
-}  // namespace aibox::hid
+}  // namespace aibox::usb

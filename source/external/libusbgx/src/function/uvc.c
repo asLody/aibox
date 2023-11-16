@@ -1076,48 +1076,17 @@ static int dir_nftw_cb(const char *pathname, const struct stat *sbuf, int type, 
 
 int remove_dir(const char *dirpath)
 {
-	const int max_open_descs = 8;
-	int ret;
-
-	ret = nftw(dirpath, dir_nftw_cb, max_open_descs, FTW_DEPTH | FTW_MOUNT | FTW_PHYS);
-	if (ret < 0) {
-		ERROR("nftw failed");
-		return ret;
-	}
-
-	return 0;
+    return -USBG_ERROR_OTHER_ERROR;
 }
 
 static int content_nftw_cb(const char *pathname, const struct stat *sbuf, int type, struct FTW *ftwb)
 {
-	(void) sbuf;
-	(void) type;
-	(void) ftwb;
-	int ret;
-
-	if(ftwb->level == 0)
-		return 0;
-
-	ret = remove(pathname);
-	if(ret < -1)
-		ERROR("failed to remove %s - %s", pathname, strerror(ret));
-
-	return 0;
+    return -USBG_ERROR_OTHER_ERROR;
 }
 
 int remove_dir_content(const char *dirpath)
 {
-	const int max_open_descs = 8;
-	int ret;
-
-	/* traverse in reverse order (handle directory after it's content), stay within the same file system and do not follow symbolic links */
-	ret = nftw(dirpath, content_nftw_cb, max_open_descs, FTW_DEPTH | FTW_MOUNT | FTW_PHYS);
-	if (ret < 0) {
-		ERROR("nftw failed");
-		return ret;
-	}
-
-	return 0;
+	return -USBG_ERROR_OTHER_ERROR;
 }
 
 static int uvc_remove(struct usbg_function *f, int opts)
@@ -1189,31 +1158,5 @@ int usbg_f_uvc_get_attrs(usbg_f_uvc *uvcf, struct usbg_f_uvc_attrs *attrs)
 
 int usbg_f_uvc_set_attrs(usbg_f_uvc *uvcf, const struct usbg_f_uvc_attrs *attrs)
 {
-	char path[USBG_MAX_PATH_LENGTH];
-	struct usbg_f_uvc_format_attrs **format_attrs;
-	int ret = USBG_SUCCESS;
-	int nmb, i;
 
-	if (!attrs)
-		return USBG_ERROR_INVALID_PARAM;
-
-	nmb = snprintf(path, sizeof(path), "%s/%s", uvcf->func.path, uvcf->func.name);
-	if (nmb >= sizeof(path))
-		return USBG_ERROR_PATH_TOO_LONG;
-
-	for(format_attrs = attrs->formats, i = 0; format_attrs[i]; ++i) {
-		ret = uvc_set_streaming(path, format_attrs[i]->format, format_attrs[i]);
-		if(ret != USBG_SUCCESS)
-			ERROR("Error: %d", ret);
-	}
-
-	ret = uvc_set_class(uvcf, UVC_PATH_CONTROL);
-	if (ret != USBG_SUCCESS)
-		return ret;
-
-	ret = uvc_set_class(uvcf, UVC_PATH_STREAMING);
-	if (ret != USBG_SUCCESS)
-		return ret;
-
-	return ret;
 }

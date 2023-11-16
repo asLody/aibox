@@ -96,7 +96,7 @@ int usbg_f_hid_set_attrs(usbg_f_hid *hf,
 
 
 /**
- * @brief Cleanup HID report descriptor structure after usage
+ * @brief Cleanup HID report report_descriptor structure after usage
  * @param[in] report_desc to be cleaned up
  */
 static inline void usbg_f_hid_cleanup_report_desc(
@@ -178,9 +178,9 @@ static inline int usbg_f_hid_set_protocol(usbg_f_hid *hf,
 }
 
 /**
- * @brief Get HID report descriptor
+ * @brief Get HID report report_descriptor
  * @param[in] hf Pointer to hid function
- * @param[out] report_desc Report descriptor
+ * @param[out] report_desc Report report_descriptor
  * @return 0 on success usbg_error if error occurred.
  */
 static inline int usbg_f_hid_get_report_desc(usbg_f_hid *hf,
@@ -191,9 +191,9 @@ static inline int usbg_f_hid_get_report_desc(usbg_f_hid *hf,
 }
 
 /**
- * @brief Set HID report descriptor
+ * @brief Set HID report report_descriptor
  * @param[in] hf Pointer to hid function
- * @param[out] report_desc Report descriptor
+ * @param[out] report_desc Report report_descriptor
  * @return 0 on success usbg_error if error occurred.
  */
 static inline int usbg_f_hid_set_report_desc(usbg_f_hid *hf,
@@ -204,9 +204,9 @@ static inline int usbg_f_hid_set_report_desc(usbg_f_hid *hf,
 }
 
 /**
- * @brief Get HID report descriptor
+ * @brief Get HID report report_descriptor
  * @param[in] hf Pointer to hid function
- * @param[out] report_desc Report descriptor
+ * @param[out] report_desc Report report_descriptor
  * @return 0 on success usbg_error if error occurred.
  */
 static inline int usbg_f_hid_get_report_desc_raw(usbg_f_hid *hf,
@@ -228,9 +228,9 @@ static inline int usbg_f_hid_get_report_desc_raw(usbg_f_hid *hf,
 }
 
 /**
- * @brief Set HID report descriptor
+ * @brief Set HID report report_descriptor
  * @param[in] hf Pointer to hid function
- * @param[out] report_desc Report descriptor
+ * @param[out] report_desc Report report_descriptor
  * @return 0 on success usbg_error if error occurred.
  */
 static inline int usbg_f_hid_set_report_desc_raw(usbg_f_hid *hf,

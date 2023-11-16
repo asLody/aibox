@@ -1,13 +1,13 @@
 #include "core/core.h"
-#include "core/hid/otg.h"
+#include "core/usb/usb_gadget.h"
 
 namespace aibox {
 
-Core::Core() { otg_daemon = std::make_unique<hid::OTGDaemon>(); }
+Core::Core() { gadget = std::make_unique<usb::UsbGadget>(); }
 
-void Core::StartSystem() { otg_daemon->Start(); }
+void Core::StartSystem() { gadget->Configure(); }
 
-hid::Mouse* Core::GetMouse() const { return otg_daemon->GetMouse(); }
+usb::UsbGadget* Core::GetUsbGadget() { return gadget.get(); }
 
 Core::~Core() = default;
 

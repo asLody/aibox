@@ -1,21 +1,38 @@
+#include <cstring>
 #include <linux/usb/ch9.h>
 #include <usbg/function/hid.h>
 #include <usbg/usbg.h>
 
-#include "core/hid/otg.h"
+#include "core/usb/usb_gadget.h"
 
-namespace aibox::hid {
+namespace aibox::usb {
 
-OTGDaemon::OTGDaemon() : mouse(std::make_shared<Mouse>()) {}
+UsbGadget::UsbGadget() = default;
 
-OTGDaemon::~OTGDaemon() = default;
+UsbGadget::~UsbGadget() { usbg_cleanup(u_state); }
 
-void OTGDaemon::Start() {
-    int ret = usbg_init("/config", &u_state);
+void UsbGadget::Configure() {
+    int ret = usbg_init("/sys/kernel/config", &u_state);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error on USB gadget init");
     }
-    const auto& config = mouse->GetConfig();
+    u_gadget = usbg_get_gadget(u_state, gadget_name);
+    if (u_gadget == nullptr) {
+        CreateGadget();
+    } else {
+        printf("Gadget already exists!\n");
+    }
+
+    mouse = std::make_unique<Mouse>(config);
+    mouse->Open("/dev/hidg0");
+}
+
+void UsbGadget::RemoveGadgets() {
+    usbg_gadget* exist_gadget;
+    usbg_for_each_gadget(exist_gadget, u_state) { usbg_rm_gadget(exist_gadget, USBG_RM_RECURSE); }
+}
+
+void UsbGadget::CreateGadget() {
     const usbg_gadget_attrs g_attrs = {
             .bcdUSB = 0x0200,
             .bDeviceClass = USB_CLASS_PER_INTERFACE,
@@ -34,35 +51,24 @@ void OTGDaemon::Start() {
     struct usbg_config_strs c_strs = {
             .configuration = const_cast<char*>(config.configuration.c_str()),
     };
-    const auto report_desc = mouse->GetReportDescriptor();
+    const auto& report_desc = config.report_descriptor;
+    const auto& data = report_desc.GetBytes();
+
     struct usbg_f_hid_attrs f_attrs = {
             .protocol = 0,
             .report_desc =
                     {
-                            .desc = const_cast<char*>(report_desc.data()),
-                            .len = static_cast<unsigned int>(report_desc.size()),
+                            .desc = const_cast<char*>(data.data()),
+                            .len = static_cast<unsigned int>(data.size()),
                     },
-            .report_length = 6,
+            .report_length = report_desc.GetReportLength(),
             .subclass = 0,
     };
     usbg_function* u_function{};
     usbg_config* u_config{};
 
-    const char* gadget_name = "aibox";
-
-    // Disable all gadgets first.
-    usbg_gadget* exist_gadget;
-    usbg_for_each_gadget(exist_gadget, u_state) {
-        const char* name = usbg_get_gadget_name(exist_gadget);
-        if (!strcmp(name, gadget_name)) {
-            usbg_rm_gadget(exist_gadget, USBG_RM_RECURSE);
-        } else {
-            usbg_disable_gadget(exist_gadget);
-        }
-    }
-
     // Start creating our gadget.
-    ret = usbg_create_gadget(u_state, gadget_name, &g_attrs, &g_strs, &u_gadget);
+    int ret = usbg_create_gadget(u_state, gadget_name, &g_attrs, &g_strs, &u_gadget);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error creating gadget");
     }
@@ -85,9 +91,4 @@ void OTGDaemon::Start() {
     printf("Active usb gadget success!\n");
 }
 
-void OTGDaemon::Stop() const {
-    usbg_disable_gadget(u_gadget);
-    usbg_cleanup(u_state);
-}
-
-}  // namespace aibox::hid
+}  // namespace aibox::usb
