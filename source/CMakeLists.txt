@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.15.0)
 project("AiBox")
 
 set(CMAKE_CXX_STANDARD 17)
+set(BUILD_SHARED_LIBS OFF)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

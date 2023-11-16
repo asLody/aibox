@@ -10,4 +10,4 @@ add_library(core STATIC
         usb/config.cpp
         usb/config.h)
 
-target_link_libraries(core libusbgx rknn)
+target_link_libraries(core base libusbgx rknn)

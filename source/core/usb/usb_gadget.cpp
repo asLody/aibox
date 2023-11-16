@@ -4,6 +4,7 @@
 #include <usbg/function/hid.h>
 #include <usbg/usbg.h>
 
+#include "base/logging.h"
 #include "core/usb/usb_gadget.h"
 
 namespace aibox::usb {
@@ -21,7 +22,7 @@ void UsbGadget::Configure() {
     if (u_gadget == nullptr) {
         CreateGadget();
     } else {
-        printf("Gadget already exists!\n");
+        LOG_INFO("Gadget {} already exists, skip creating", gadget_name);
     }
 
     mouse = std::make_unique<Mouse>(config);
@@ -89,7 +90,7 @@ void UsbGadget::CreateGadget() {
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error enabling gadget");
     }
-    printf("Active usb gadget success!\n");
+    LOG_INFO("Gadget {} has been created", gadget_name);
 }
 
 }  // namespace aibox::usb
