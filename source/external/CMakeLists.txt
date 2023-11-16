@@ -1,3 +1,4 @@
 add_subdirectory(libusbgx)
 add_subdirectory(rknn)
 add_subdirectory(fmt)
+add_subdirectory(hid-rp)
