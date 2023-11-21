@@ -7,8 +7,6 @@
 
 namespace aibox::cv {
 
-using ModelInput = std::vector<u8>;
-
 class Model {
 public:
     Model();
@@ -16,6 +14,8 @@ public:
     virtual ~Model();
 
     virtual void Load(const std::string& model_path) = 0;
+
+    virtual void Inference() = 0;
 };
 
 }  // namespace aibox::cv
