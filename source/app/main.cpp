@@ -8,8 +8,8 @@ int main(int argc, char** argv) {
     core.StartSystem();
     auto mouse = core.GetUsbGadget()->GetMouse();
     for (;;) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        mouse->MoveTo(32767, 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        mouse->MoveBy(10, 0);
     }
     return 0;
 }

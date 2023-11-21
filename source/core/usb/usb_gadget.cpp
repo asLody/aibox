@@ -57,14 +57,14 @@ void UsbGadget::CreateGadget() {
     const auto& data = report_desc.GetBytes();
 
     struct usbg_f_hid_attrs f_attrs = {
-            .protocol = 0,
+            .protocol = 2,
             .report_desc =
                     {
                             .desc = const_cast<char*>(data.data()),
                             .len = static_cast<unsigned int>(data.size()),
                     },
             .report_length = report_desc.GetReportLength(),
-            .subclass = 0,
+            .subclass = 1,
     };
     usbg_function* u_function{};
     usbg_config* u_config{};

@@ -22,10 +22,10 @@ std::vector<char> ReportDescriptor::GetBytes() const {
                                                          usage_page<generic_desktop>(),
                                                          usage(generic_desktop::X),
                                                          usage(generic_desktop::Y),
-                                                         logical_limits<2, int8_t>(0, 32767),
-                                                         report_size(16),
+                                                         logical_limits<1, int8_t>(-127, 127),
+                                                         report_size(8),
                                                          report_count(2),
-                                                         input::absolute_variable(),
+                                                         input::relative_variable(),
                                                          usage(generic_desktop::WHEEL),
                                                          logical_limits<1, int8_t>(-127, 127),
                                                          report_size(8),
@@ -34,7 +34,7 @@ std::vector<char> ReportDescriptor::GetBytes() const {
     return std::vector<char>{desc.begin(), desc.end()};
 }
 
-uint32_t ReportDescriptor::GetReportLength() const { return 6; }
+uint32_t ReportDescriptor::GetReportLength() const { return 4; }
 
 void ReportDescriptor::WriteToFile(const std::string& path) const {
     FILE* fp = fopen(path.c_str(), "wb");

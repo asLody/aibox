@@ -24,22 +24,16 @@ void Mouse::Close() {
     }
 }
 
-void Mouse::MoveTo(int16_t x, int16_t y) {
-    cur_x = x;
-    cur_y = y;
-    SendReport();
+void Mouse::MoveBy(int8_t x, int8_t y) {
+    if (!SendReport({.x = x, .y = y})) {
+        throw std::runtime_error("Error sending mouse report");
+    }
 }
 
-bool Mouse::SendReport() {
+bool Mouse::SendReport(const MouseReport& report) {
     if (hid_fd < 0) {
         throw std::runtime_error("HID device not opened");
     }
-    MouseReport report = {
-            .buttons = pressed_buttons,
-            .x = cur_x,
-            .y = cur_y,
-            .wheel_y = cur_wheel_y,
-    };
     return write(hid_fd, &report, sizeof(report)) == sizeof(report);
 }
 

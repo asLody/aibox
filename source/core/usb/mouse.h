@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "base/macros.h"
 #include "core/usb/config.h"
 #include "core/usb/report_descriptor.h"
 
@@ -9,8 +10,8 @@ namespace aibox::usb {
 
 struct __attribute__((packed)) MouseReport {
     uint8_t buttons;
-    int16_t x;
-    int16_t y;
+    int8_t x;
+    int8_t y;
     int8_t wheel_y;
 };
 
@@ -24,16 +25,14 @@ public:
 
     void Close();
 
-    void MoveTo(int16_t x, int16_t y);
+    void MoveBy(int8_t x, int8_t y);
 
-    bool SendReport();
+    ALWAYS_INLINE bool SendReport(const MouseReport& report);
 
 private:
     MouseConfig config;
     int hid_fd = -1;
     uint8_t pressed_buttons{};
-    int16_t cur_x{}, cur_y{};
-    int8_t cur_wheel_y{};
 };
 
 }  // namespace aibox::usb
