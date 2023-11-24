@@ -9,10 +9,16 @@ add_library(core STATIC
         usb/report_descriptor.h
         usb/config.cpp
         usb/config.h
-        cv/model.cpp
-        cv/model.h
-        cv/rknn/model_rknn.cpp
-        cv/rknn/model_rknn.h
+        model/model.cpp
+        model/model.h
+        model/rknn/model_rknn.cpp
+        model/rknn/model_rknn.h
+        model/yolo/yolo_v6.cpp
+        model/yolo/yolo_v6.h
+        model/object_detector.cpp
+        model/object_detector.h
+        model/yolo/yolo.cpp
+        model/yolo/yolo.h
 )
 
-target_link_libraries(core base hid-rp libusbgx rknn)
+target_link_libraries(core base hid-rp libusbgx rknn CImg)

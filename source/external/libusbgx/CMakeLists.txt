@@ -20,5 +20,7 @@ add_library(libusbgx STATIC
 set(USBG_VERSION_HEX 0x000000000)
 configure_file(include/usbg/usbg_version.h.in usbg_version.h)
 
+target_compile_definitions(libusbgx PRIVATE _GNU_SOURCE)
+
 target_include_directories(libusbgx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(libusbgx PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
