@@ -4,6 +4,8 @@ add_library(base STATIC
         logging.h
         macros.h
         file_utils.cpp
-        file_utils.h)
+        file_utils.h
+        pid.cpp
+        pid.h)
 
 target_link_libraries(base fmt::fmt -lpthread)
