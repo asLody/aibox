@@ -9,6 +9,17 @@ add_library(core STATIC
         usb/report_descriptor.h
         usb/config.cpp
         usb/config.h
+        usb/hid-parser/descriptor.cpp
+        usb/hid-parser/descriptor.h
+        usb/hid-parser/item.cpp
+        usb/hid-parser/item.h
+        usb/hid-parser/parser.cpp
+        usb/hid-parser/parser.h
+        usb/hid-parser/report.cpp
+        usb/hid-parser/report.h
+        usb/hid-parser/units.cpp
+        usb/hid-parser/units.h
+        usb/hid-parser/usages.h
         model/model.cpp
         model/model.h
         model/rknn/model_rknn.cpp
@@ -18,7 +29,6 @@ add_library(core STATIC
         model/object_detector.cpp
         model/object_detector.h
         model/yolo/yolo.cpp
-        model/yolo/yolo.h
-)
+        model/yolo/yolo.h)
 
 target_link_libraries(core base hid-rp libusbgx rknn CImg)
