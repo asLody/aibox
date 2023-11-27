@@ -29,6 +29,11 @@ add_library(core STATIC
         model/object_detector.cpp
         model/object_detector.h
         model/yolo/yolo.cpp
-        model/yolo/yolo.h)
+        model/yolo/yolo.h
+        usb/input_device.cpp
+        usb/input_device.h
+        usb/output_device.cpp
+        usb/output_device.h
+)
 
 target_link_libraries(core base hid-rp libusbgx rknn CImg)

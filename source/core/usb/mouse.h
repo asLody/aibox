@@ -4,6 +4,7 @@
 #include <vector>
 #include "base/macros.h"
 #include "core/usb/config.h"
+#include "core/usb/output_device.h"
 #include "core/usb/report_descriptor.h"
 
 namespace aibox::usb {
@@ -15,15 +16,11 @@ struct __attribute__((packed)) MouseReport {
     int8_t wheel_y;
 };
 
-class Mouse {
+class Mouse : public OutputDevice {
 public:
     explicit Mouse(MouseConfig config);
 
     ~Mouse();
-
-    void Open(const std::string& dev);
-
-    void Close();
 
     void MoveBy(int8_t x, int8_t y);
 
@@ -31,8 +28,6 @@ public:
 
 private:
     MouseConfig config;
-    int hid_fd = -1;
-    uint8_t pressed_buttons{};
 };
 
 }  // namespace aibox::usb
