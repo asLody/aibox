@@ -1,0 +1,5 @@
+add_library(rga SHARED IMPORTED GLOBAL)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set_target_properties(rga PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/linux/librga.a)
+endif()
+target_include_directories(rga INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

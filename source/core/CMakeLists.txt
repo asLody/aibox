@@ -36,4 +36,4 @@ add_library(core STATIC
         usb/output_device.h
 )
 
-target_link_libraries(core base hid-rp libusbgx rknn CImg)
+target_link_libraries(core base hid-rp libusbgx rga rknn CImg -lpthread)
