@@ -5,7 +5,9 @@ namespace aibox {
 
 Core::Core() { gadget = std::make_unique<usb::UsbGadget>(); }
 
-void Core::StartSystem() { gadget->Configure(); }
+void Core::StartSystem() {
+
+}
 
 usb::UsbGadget* Core::GetUsbGadget() { return gadget.get(); }
 

@@ -20,11 +20,11 @@ private:
     void PostProcess() override;
 
     void ProcessData(const TensorInfo* tensor_box,
-                         const TensorInfo* tensor_score,
-                         const TensorInfo* tensor_score_sum,
-                         u32 grid_h,
-                         u32 grid_w,
-                         float stride);
+                     const TensorInfo* tensor_score,
+                     const TensorInfo* tensor_score_sum,
+                     u32 grid_h,
+                     u32 grid_w,
+                     float stride);
 };
 
 }  // namespace aibox::model

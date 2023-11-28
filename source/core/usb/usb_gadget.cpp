@@ -13,20 +13,17 @@ UsbGadget::UsbGadget() = default;
 
 UsbGadget::~UsbGadget() { usbg_cleanup(u_state); }
 
-void UsbGadget::Configure() {
+void UsbGadget::Configure(const HIDDeviceDescriptor& descriptor) {
     int ret = usbg_init("/sys/kernel/config", &u_state);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error on USB gadget init");
     }
     u_gadget = usbg_get_gadget(u_state, gadget_name);
     if (u_gadget == nullptr) {
-        CreateGadget();
+        CreateGadget(descriptor);
     } else {
         LOG_INFO("Gadget {} already exists, skip creating", gadget_name);
     }
-
-    mouse = std::make_unique<Mouse>(config);
-    mouse->Open("/dev/hidg0");
 }
 
 void UsbGadget::RemoveGadgets() {
@@ -34,42 +31,38 @@ void UsbGadget::RemoveGadgets() {
     usbg_for_each_gadget(exist_gadget, u_state) { usbg_rm_gadget(exist_gadget, USBG_RM_RECURSE); }
 }
 
-void UsbGadget::CreateGadget() {
+void UsbGadget::CreateGadget(const HIDDeviceDescriptor& descriptor) {
     const usbg_gadget_attrs g_attrs = {
-            .bcdUSB = 0x0200,
+            .bcdUSB = descriptor.bcd_usb,
             .bDeviceClass = USB_CLASS_PER_INTERFACE,
-            .bDeviceSubClass = 0x00,
-            .bDeviceProtocol = 0x00,
-            .bMaxPacketSize0 = 64,
-            .idVendor = config.vendor_id,
-            .idProduct = config.product_id,
-            .bcdDevice = config.device_version,
+            .bDeviceSubClass = descriptor.device_subclass,
+            .bDeviceProtocol = descriptor.device_protocol,
+            .bMaxPacketSize0 = descriptor.max_packet_size0,
+            .idVendor = descriptor.vendor_id,
+            .idProduct = descriptor.product_id,
+            .bcdDevice = descriptor.bcd_device,
     };
     struct usbg_gadget_strs g_strs = {
-            .manufacturer = const_cast<char*>(config.manufacturer.c_str()),
-            .product = const_cast<char*>(config.product.c_str()),
-            .serial = const_cast<char*>(config.serial.c_str()),
+            .manufacturer = const_cast<char*>(descriptor.manufacturer.c_str()),
+            .product = const_cast<char*>(descriptor.product.c_str()),
+            .serial = const_cast<char*>(descriptor.serial.c_str()),
     };
     struct usbg_config_strs c_strs = {
-            .configuration = const_cast<char*>(config.configuration.c_str()),
+            .configuration = (char*)"config",
     };
-    const auto& report_desc = config.report_descriptor;
-    const auto& data = report_desc.GetBytes();
-
     struct usbg_f_hid_attrs f_attrs = {
-            .protocol = 2,
+            .protocol = descriptor.hid_protocol,
             .report_desc =
                     {
-                            .desc = const_cast<char*>(data.data()),
-                            .len = static_cast<unsigned int>(data.size()),
+                            .desc = (char*)descriptor.report_descriptor_data.data(),
+                            .len = (unsigned int)descriptor.report_descriptor_data.size(),
                     },
-            .report_length = report_desc.GetReportLength(),
-            .subclass = 1,
+            .report_length = descriptor.report_length,
+            .subclass = descriptor.hid_subclass,
     };
     usbg_function* u_function{};
     usbg_config* u_config{};
 
-    // Start creating our gadget.
     int ret = usbg_create_gadget(u_state, gadget_name, &g_attrs, &g_strs, &u_gadget);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error creating gadget");

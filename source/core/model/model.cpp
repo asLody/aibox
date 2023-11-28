@@ -7,8 +7,6 @@ Model::Model() = default;
 
 Model::~Model() = default;
 
-std::shared_ptr<Model> Model::Create() {
-    return std::make_shared<Model_RKNN>();
-}
+std::shared_ptr<Model> Model::Create() { return std::make_shared<Model_RKNN>(); }
 
-}  // namespace aibox::cv
+}  // namespace aibox::model

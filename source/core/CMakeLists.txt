@@ -5,10 +5,8 @@ add_library(core STATIC
         usb/mouse.h
         usb/usb_gadget.cpp
         usb/usb_gadget.h
-        usb/report_descriptor.cpp
-        usb/report_descriptor.h
-        usb/config.cpp
-        usb/config.h
+        usb/hid_device_descriptor.cpp
+        usb/hid_device_descriptor.h
         usb/hid-parser/descriptor.cpp
         usb/hid-parser/descriptor.h
         usb/hid-parser/item.cpp
@@ -30,10 +28,10 @@ add_library(core STATIC
         model/object_detector.h
         model/yolo/yolo.cpp
         model/yolo/yolo.h
-        usb/input_device.cpp
-        usb/input_device.h
-        usb/output_device.cpp
-        usb/output_device.h
+        usb/input_hid_device.cpp
+        usb/input_hid_device.h
+        usb/output_hid_device.cpp
+        usb/output_hid_device.h
 )
 
-target_link_libraries(core base hid-rp libusbgx rga rknn CImg -lpthread)
+target_link_libraries(core base usb-1.0 hid-rp libusbgx rga rknn CImg -lpthread)

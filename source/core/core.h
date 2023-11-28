@@ -6,7 +6,7 @@ namespace aibox {
 
 namespace usb {
 class UsbGadget;
-class Mouse;
+class OutputMouse;
 }  // namespace usb
 
 class Core {
@@ -17,7 +17,7 @@ public:
 
     void StartSystem();
 
-    usb::UsbGadget *GetUsbGadget();
+    usb::UsbGadget* GetUsbGadget();
 
 private:
     std::unique_ptr<usb::UsbGadget> gadget;

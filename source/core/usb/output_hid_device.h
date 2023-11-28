@@ -4,11 +4,9 @@
 
 namespace aibox::usb {
 
-class OutputDevice {
+class OutputHIDDevice {
 public:
-    OutputDevice() = default;
-
-    virtual ~OutputDevice();
+    virtual ~OutputHIDDevice();
 
     void Open(const std::string& dev);
 

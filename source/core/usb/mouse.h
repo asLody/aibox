@@ -1,33 +1,52 @@
 #pragma once
 
+#include <optional>
+#include <span>
 #include <string>
 #include <vector>
 #include "base/macros.h"
-#include "core/usb/config.h"
-#include "core/usb/output_device.h"
-#include "core/usb/report_descriptor.h"
+#include "core/usb/hid_device_descriptor.h"
+#include "core/usb/input_hid_device.h"
+#include "core/usb/output_hid_device.h"
 
 namespace aibox::usb {
 
-struct __attribute__((packed)) MouseReport {
-    uint8_t buttons;
-    int8_t x;
-    int8_t y;
-    int8_t wheel_y;
+struct MouseReport {
+    bool is_absolute;
+    s32 x, y;
+    s32 scroll;
 };
 
-class Mouse : public OutputDevice {
+class MouseProtocol {
 public:
-    explicit Mouse(MouseConfig config);
+    void ParseReportDescriptor(const hid::ReportDescriptor& descriptor);
 
-    ~Mouse();
-
-    void MoveBy(int8_t x, int8_t y);
-
-    ALWAYS_INLINE bool SendReport(const MouseReport& report);
+    void Decode(MouseReport& report, std::span<u8> data);
 
 private:
-    MouseConfig config;
+    u32 report_length{};
+    u8 report_id{};
+    std::optional<hid::Attributes> movement_x;
+    std::optional<hid::Attributes> movement_y;
+    std::optional<hid::Attributes> position_x;
+    std::optional<hid::Attributes> position_y;
+    std::optional<hid::Attributes> scroll_v;
+    std::vector<hid::Attributes> buttons;
+};
+
+class InputMouse : public InputHIDDevice {
+public:
+    InputMouse(u16 vid, u16 pid);
+
+protected:
+    bool MatchInterfaceDescriptor(const libusb_interface_descriptor* interface_desc) override;
+};
+
+class OutputMouse : public OutputHIDDevice {
+public:
+    explicit OutputMouse();
+
+    ~OutputMouse() override;
 };
 
 }  // namespace aibox::usb

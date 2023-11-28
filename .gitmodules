@@ -4,3 +4,6 @@
 [submodule "source/external/Catch2"]
 	path = source/external/Catch2
 	url = https://github.com/catchorg/Catch2
+[submodule "source/external/libusb-cmake"]
+	path = source/external/libusb-cmake
+	url = https://github.com/libusb/libusb-cmake

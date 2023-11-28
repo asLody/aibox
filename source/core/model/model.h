@@ -29,7 +29,7 @@ struct TensorInfo {
     s32 zp;
     float scale;
 
-    template <typename T = s8> [[nodiscard]]T * Data() const {
+    template <typename T = s8> [[nodiscard]] T* Data() const {
         return reinterpret_cast<T*>(data.data());
     }
 };
