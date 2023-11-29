@@ -14,7 +14,12 @@ InputHIDDevice::InputHIDDevice() : vid(0), pid(0) {}
 
 InputHIDDevice::InputHIDDevice(u16 vid, u16 pid) : vid(vid), pid(pid) {}
 
-InputHIDDevice::~InputHIDDevice() = default;
+InputHIDDevice::~InputHIDDevice() {
+    if (handle) {
+        libusb_release_interface(handle, interface_num);
+        libusb_close(handle);
+    }
+}
 
 void InputHIDDevice::Open() {
     libusb_init(nullptr);
@@ -113,6 +118,25 @@ void InputHIDDevice::OpenUSB(libusb_device* dev,
     r = libusb_claim_interface(handle, interface_num);
     if (r < 0) throw std::runtime_error("Error claiming USB device interface");
 
+    transfer = libusb_alloc_transfer(0);
+    for (int i = 0; i < interface_desc->bNumEndpoints; ++i) {
+        const struct libusb_endpoint_descriptor* ep = &interface_desc->endpoint[i];
+        const int is_interrupt =
+                (ep->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_INTERRUPT;
+        const int is_output =
+                (ep->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT;
+        const int is_input =
+                (ep->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN;
+
+        if (input_endpoint == 0 && is_interrupt && is_input) {
+            input_endpoint = ep->bEndpointAddress;
+            input_ep_max_packet_size = ep->wMaxPacketSize;
+        }
+        if (output_endpoint == 0 && is_interrupt && is_output) {
+            output_endpoint = ep->bEndpointAddress;
+        }
+    }
+
     descriptor.bcd_usb = desc->bcdDevice;
     descriptor.device_subclass = desc->bDeviceSubClass;
     descriptor.device_protocol = desc->bDeviceProtocol;
@@ -163,6 +187,7 @@ void InputHIDDevice::OpenUSB(libusb_device* dev,
         throw std::runtime_error("USB device report descriptor has more than one report");
 
     descriptor.report_length = descriptor.report_descriptor->report[0].input_byte_sz;
+    InitProtocol();
 }
 
 }  // namespace aibox::usb

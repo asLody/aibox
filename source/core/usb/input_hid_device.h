@@ -22,11 +22,17 @@ public:
 protected:
     virtual bool MatchInterfaceDescriptor(const libusb_interface_descriptor* interface_desc);
 
+    virtual void InitProtocol() {}
+
 private:
     u16 vid, pid;
     HIDDeviceDescriptor descriptor{};
     u8 interface_num{};
     libusb_device_handle* handle{};
+    libusb_transfer* transfer{};
+    u16 input_ep_max_packet_size{};
+    u8 input_endpoint{};
+    u8 output_endpoint{};
 
     void OpenUSB(libusb_device* dev,
                  const libusb_device_descriptor* desc,

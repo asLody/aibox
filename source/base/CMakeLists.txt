@@ -6,6 +6,7 @@ add_library(base STATIC
         file_utils.cpp
         file_utils.h
         pid.cpp
-        pid.h)
+        pid.h
+        static_vector.h)
 
 target_link_libraries(base fmt::fmt -lpthread)

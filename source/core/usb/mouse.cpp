@@ -4,6 +4,8 @@
 
 namespace aibox::usb {
 
+InputMouse::InputMouse() : InputHIDDevice() {}
+
 InputMouse::InputMouse(u16 vid, u16 pid) : InputHIDDevice(vid, pid) {}
 
 bool InputMouse::MatchInterfaceDescriptor(const libusb_interface_descriptor* interface_desc) {
@@ -13,7 +15,12 @@ bool InputMouse::MatchInterfaceDescriptor(const libusb_interface_descriptor* int
     return interface_desc->bInterfaceProtocol == 2 /* mouse */;
 }
 
-OutputMouse::OutputMouse() = default;
+void InputMouse::InitProtocol() {
+    const auto& desc = GetDescriptor().report_descriptor;
+    protocol.ParseReportDescriptor(desc->report[0]);
+}
+
+OutputMouse::OutputMouse(const MouseProtocol& protocol) : protocol(protocol) {}
 
 OutputMouse::~OutputMouse() { Close(); }
 
@@ -41,30 +48,48 @@ void MouseProtocol::ParseReportDescriptor(const hid::ReportDescriptor& descripto
                                                   hid::usage::GenericDesktop::kWheel)) {
             scroll_v = field.attr;
         } else if (field.attr.usage.page == hid::usage::Page::kButton) {
-            buttons.push_back(field.attr);
+            if (buttons.size() < kMaxMouseNumButtons) {
+                buttons.push_back(field.attr);
+            }
         }
+    }
+    is_absolute = movement_x.has_value();
+}
+
+void MouseProtocol::Decode(MouseReport& report, std::span<u8> data) const {
+    const auto extract = [&](const std::optional<hid::Attributes>& attr, double* value) {
+        if (!attr) return;
+        hid::ExtractAsUnitType(data.data(), data.size(), *attr, value);
+    };
+    if (is_absolute) {
+        extract(movement_x, &report.x);
+        extract(movement_y, &report.y);
+    } else {
+        extract(position_x, &report.x);
+        extract(position_y, &report.y);
+    }
+    extract(scroll_v, &report.scroll);
+    report.buttons.resize(buttons.size());
+    for (size_t i = 0; i < buttons.size(); i++) {
+        extract(buttons[i], &report.buttons[i]);
     }
 }
 
-void MouseProtocol::Decode(MouseReport& report, std::span<u8> data) {
-    report.is_absolute = movement_x.has_value();
-    if (report.is_absolute) {
-        if (movement_x) {
-            hid::ExtractUint(data.data(), data.size(), movement_x.value(), (u32*)&report.x);
-        }
-        if (movement_y) {
-            hid::ExtractUint(data.data(), data.size(), movement_y.value(), (u32*)&report.y);
-        }
+void MouseProtocol::Encode(std::span<u8> data, const MouseReport& report) const {
+    const auto insert = [&](const std::optional<hid::Attributes>& attr, double value) {
+        if (!attr) return;
+        hid::InsertAsUnitType(data.data(), data.size(), *attr, value);
+    };
+    if (is_absolute) {
+        insert(movement_x, report.x);
+        insert(movement_y, report.y);
     } else {
-        if (position_x) {
-            hid::ExtractUint(data.data(), data.size(), position_x.value(), (u32*)&report.x);
-        }
-        if (position_y) {
-            hid::ExtractUint(data.data(), data.size(), position_y.value(), (u32*)&report.y);
-        }
+        insert(position_x, report.x);
+        insert(position_y, report.y);
     }
-    if (scroll_v) {
-        hid::ExtractUint(data.data(), data.size(), scroll_v.value(), (u32*)&report.scroll);
+    insert(scroll_v, report.scroll);
+    for (size_t i = 0; i < report.buttons.size(); i++) {
+        insert(buttons[i], report.buttons[i]);
     }
 }
 
