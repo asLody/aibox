@@ -1,10 +1,15 @@
+#include <stdexcept>
 #include <thread>
 #include "core/core.h"
-#include "core/usb/mouse.h"
-#include "core/usb/usb_gadget.h"
 
 int main(int argc, char** argv) {
+    if (geteuid() != 0) {
+        throw std::runtime_error("You must run this program as root.");
+    }
     aibox::Core core;
-    core.StartSystem();
+    core.Run();
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     return 0;
 }

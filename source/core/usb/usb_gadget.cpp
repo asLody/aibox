@@ -9,21 +9,48 @@
 
 namespace aibox::usb {
 
-UsbGadget::UsbGadget() = default;
-
-UsbGadget::~UsbGadget() { usbg_cleanup(u_state); }
-
-void UsbGadget::Configure(const HIDDeviceDescriptor& descriptor) {
+UsbGadget::UsbGadget() {
     int ret = usbg_init("/sys/kernel/config", &u_state);
     if (ret != USBG_SUCCESS) {
         throw std::runtime_error("Error on USB gadget init");
     }
     u_gadget = usbg_get_gadget(u_state, gadget_name);
-    if (u_gadget == nullptr) {
+}
+
+UsbGadget::~UsbGadget() { usbg_cleanup(u_state); }
+
+void UsbGadget::Configure(const HIDGadgetDescriptor& descriptor) {
+    PrintDescriptor(descriptor);
+    if (!u_gadget) {
         CreateGadget(descriptor);
     } else {
-        LOG_INFO("Gadget {} already exists, skip creating", gadget_name);
+        CheckExistingGadget(descriptor);
     }
+}
+
+void UsbGadget::PrintDescriptor(const HIDGadgetDescriptor& descriptor) {
+    LOG_INFO("Gadget descriptor:");
+    LOG_INFO("bcd_usb: {}", descriptor.bcd_usb);
+    LOG_INFO("device_subclass: {}", descriptor.device_subclass);
+    LOG_INFO("device_protocol: {}", descriptor.device_protocol);
+    LOG_INFO("max_packet_size0: {}", descriptor.max_packet_size0);
+    LOG_INFO("vendor_id: {}", descriptor.vendor_id);
+    LOG_INFO("product_id: {}", descriptor.product_id);
+    LOG_INFO("bcd_device: {}", descriptor.bcd_device);
+    LOG_INFO("manufacturer: {}", descriptor.manufacturer);
+    LOG_INFO("product: {}", descriptor.product);
+    LOG_INFO("serial: {}", descriptor.serial);
+    LOG_INFO("hid_protocol: {}", descriptor.hid_protocol);
+    LOG_INFO("hid_subclass: {}", descriptor.hid_subclass);
+    LOG_INFO("report_length: {}", descriptor.report_length);
+}
+
+void UsbGadget::CheckExistingGadget(const HIDGadgetDescriptor& descriptor) {
+    const auto identifier = GetConfiguredIdentifier();
+    if (identifier.vid != descriptor.vendor_id || identifier.pid != descriptor.product_id) {
+        throw std::runtime_error("Gadget already exists with different vendor/product id");
+    }
+    LOG_INFO("Gadget {} already exists, skip creating", gadget_name);
 }
 
 void UsbGadget::RemoveGadgets() {
@@ -31,7 +58,7 @@ void UsbGadget::RemoveGadgets() {
     usbg_for_each_gadget(exist_gadget, u_state) { usbg_rm_gadget(exist_gadget, USBG_RM_RECURSE); }
 }
 
-void UsbGadget::CreateGadget(const HIDDeviceDescriptor& descriptor) {
+void UsbGadget::CreateGadget(const HIDGadgetDescriptor& descriptor) {
     const usbg_gadget_attrs g_attrs = {
             .bcdUSB = descriptor.bcd_usb,
             .bDeviceClass = USB_CLASS_PER_INTERFACE,
@@ -84,6 +111,18 @@ void UsbGadget::CreateGadget(const HIDDeviceDescriptor& descriptor) {
         throw std::runtime_error("Error enabling gadget");
     }
     LOG_INFO("Gadget {} has been created", gadget_name);
+}
+
+HIDDeviceIdentifier UsbGadget::GetConfiguredIdentifier() const {
+    if (!u_gadget) {
+        return {};
+    }
+    usbg_gadget_attrs g_attrs{};
+    int ret = usbg_get_gadget_attrs(u_gadget, &g_attrs);
+    if (ret != USBG_SUCCESS) {
+        return {};
+    }
+    return HIDDeviceIdentifier{g_attrs.idVendor, g_attrs.idProduct};
 }
 
 }  // namespace aibox::usb

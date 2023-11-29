@@ -1,28 +1,8 @@
 #include "core/usb/hid-parser/report.h"
 #include "core/usb/hid-parser/usages.h"
-#include "core/usb/mouse.h"
+#include "core/usb/mouse/mouse.h"
 
 namespace aibox::usb {
-
-InputMouse::InputMouse() : InputHIDDevice() {}
-
-InputMouse::InputMouse(u16 vid, u16 pid) : InputHIDDevice(vid, pid) {}
-
-bool InputMouse::MatchInterfaceDescriptor(const libusb_interface_descriptor* interface_desc) {
-    if (!InputHIDDevice::MatchInterfaceDescriptor(interface_desc)) {
-        return false;
-    }
-    return interface_desc->bInterfaceProtocol == 2 /* mouse */;
-}
-
-void InputMouse::InitProtocol() {
-    const auto& desc = GetDescriptor().report_descriptor;
-    protocol.ParseReportDescriptor(desc->report[0]);
-}
-
-OutputMouse::OutputMouse(const MouseProtocol& protocol) : protocol(protocol) {}
-
-OutputMouse::~OutputMouse() { Close(); }
 
 void MouseProtocol::ParseReportDescriptor(const hid::ReportDescriptor& descriptor) {
     report_length = descriptor.input_byte_sz;

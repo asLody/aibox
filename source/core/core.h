@@ -6,7 +6,7 @@ namespace aibox {
 
 namespace usb {
 class UsbGadget;
-class OutputMouse;
+class ProxyMouse;
 }  // namespace usb
 
 class Core {
@@ -15,12 +15,18 @@ public:
 
     ~Core();
 
-    void StartSystem();
+    void Run();
 
-    usb::UsbGadget* GetUsbGadget();
+    usb::UsbGadget* GetUsbGadget() const { return gadget.get(); }
+
+    usb::ProxyMouse* GetProxyMouse() const { return mouse.get(); }
 
 private:
+    bool is_started = false;
     std::unique_ptr<usb::UsbGadget> gadget;
+    std::unique_ptr<usb::ProxyMouse> mouse;
+
+    void Setup();
 };
 
 }  // namespace aibox

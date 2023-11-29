@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include "core/usb/hid-parser/parser.h"
 #include "core/usb/hid-parser/usages.h"
-#include "core/usb/mouse.h"
 
 const uint8_t test_mouse_desc[] = {
         /*  Mouse absolute */

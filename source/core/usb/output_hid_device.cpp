@@ -2,14 +2,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "core/usb/output_hid_device.h"
+#include "fmt/format.h"
 
 namespace aibox::usb {
 
 OutputHIDDevice::~OutputHIDDevice() { Close(); }
 
-void OutputHIDDevice::Open(const std::string& dev) {
+void OutputHIDDevice::Open(u32 hid_number) {
     Close();
-    fd = open(dev.c_str(), O_RDWR, 0666);
+    const auto device_path = fmt::format("/dev/hidg{}", hid_number);
+    fd = open(device_path.c_str(), O_RDWR, 0666);
     if (fd < 0) {
         throw std::runtime_error("Error opening HID device");
     }
@@ -22,6 +24,11 @@ void OutputHIDDevice::Close() {
     }
 }
 
-ssize_t OutputHIDDevice::Write(const void* data, size_t size) { return write(fd, data, size); }
+ssize_t OutputHIDDevice::Write(const void* data, size_t size) const {
+    if (IsOpened()) {
+        return write(fd, data, size);
+    }
+    return -1;
+}
 
 }  // namespace aibox::usb

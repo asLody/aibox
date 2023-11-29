@@ -222,7 +222,7 @@ public:
 
         size_t device_sz = report_count * sizeof(ReportDescriptor) + sizeof(DeviceDescriptor);
         size_t fields_sz = fields_.size() * sizeof(ReportField);
-        size_t collect_sz = coll_size_ + sizeof(Collection);
+        size_t collect_sz = coll_size_ * sizeof(Collection);
 
         size_t total_sz = device_sz + fields_sz + collect_sz;
         if (total_sz > kMaxTotalDescriptorByteCount) {

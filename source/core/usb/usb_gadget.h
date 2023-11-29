@@ -2,7 +2,8 @@
 
 #include <memory>
 #include <usbg/usbg.h>
-#include "core/usb/hid_device_descriptor.h"
+#include "core/usb/hid_device_identifer.h"
+#include "core/usb/hid_gadget_descriptor.h"
 
 namespace aibox::usb {
 
@@ -12,7 +13,9 @@ public:
 
     ~UsbGadget();
 
-    void Configure(const HIDDeviceDescriptor& descriptor);
+    [[nodiscard]] HIDDeviceIdentifier GetConfiguredIdentifier() const;
+
+    void Configure(const HIDGadgetDescriptor& descriptor);
 
     void RemoveGadgets();
 
@@ -21,7 +24,11 @@ private:
     usbg_state* u_state{};
     usbg_gadget* u_gadget{};
 
-    void CreateGadget(const HIDDeviceDescriptor& descriptor);
+    void CreateGadget(const HIDGadgetDescriptor& descriptor);
+
+    void CheckExistingGadget(const HIDGadgetDescriptor& descriptor);
+
+    static void PrintDescriptor(const HIDGadgetDescriptor& descriptor);
 };
 
 }  // namespace aibox::usb

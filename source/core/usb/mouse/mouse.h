@@ -6,7 +6,7 @@
 #include <vector>
 #include "base/macros.h"
 #include "base/static_vector.h"
-#include "core/usb/hid_device_descriptor.h"
+#include "core/usb/hid_gadget_descriptor.h"
 #include "core/usb/input_hid_device.h"
 #include "core/usb/output_hid_device.h"
 
@@ -30,47 +30,22 @@ public:
 
     void Encode(std::span<u8> data, const MouseReport& report) const;
 
-    u32 GetReportLength() const { return report_length; }
+    [[nodiscard]] u32 GetReportLength() const { return report_length; }
 
-    u8 GetReportID() const { return report_id; }
+    [[nodiscard]] u8 GetReportID() const { return report_id; }
+
+    [[nodiscard]] u32 GetButtonUsage(u32 index) const { return buttons[index].usage.usage; }
 
 private:
     bool is_absolute{};
-    u32 report_length{};
     u8 report_id{};
+    u32 report_length{};
     std::optional<hid::Attributes> movement_x;
     std::optional<hid::Attributes> movement_y;
     std::optional<hid::Attributes> position_x;
     std::optional<hid::Attributes> position_y;
     std::optional<hid::Attributes> scroll_v;
     std::vector<hid::Attributes> buttons;
-};
-
-class InputMouse : public InputHIDDevice {
-public:
-    InputMouse();
-
-    InputMouse(u16 vid, u16 pid);
-
-    const MouseProtocol& GetProtocol() const { return protocol; }
-
-protected:
-    bool MatchInterfaceDescriptor(const libusb_interface_descriptor* interface_desc) override;
-
-    void InitProtocol() override;
-
-private:
-    MouseProtocol protocol;
-};
-
-class OutputMouse : public OutputHIDDevice {
-public:
-    explicit OutputMouse(const MouseProtocol& protocol);
-
-    ~OutputMouse() override;
-
-private:
-    MouseProtocol protocol;
 };
 
 }  // namespace aibox::usb

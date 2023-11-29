@@ -1,12 +1,10 @@
 add_library(core STATIC
         core.cpp
         core.h
-        usb/mouse.cpp
-        usb/mouse.h
         usb/usb_gadget.cpp
         usb/usb_gadget.h
-        usb/hid_device_descriptor.cpp
-        usb/hid_device_descriptor.h
+        usb/hid_gadget_descriptor.cpp
+        usb/hid_gadget_descriptor.h
         usb/hid-parser/descriptor.cpp
         usb/hid-parser/descriptor.h
         usb/hid-parser/item.cpp
@@ -32,6 +30,14 @@ add_library(core STATIC
         usb/input_hid_device.h
         usb/output_hid_device.cpp
         usb/output_hid_device.h
-)
+        usb/mouse/mouse.cpp
+        usb/mouse/mouse.h
+        usb/mouse/input_mouse.cpp
+        usb/mouse/input_mouse.h
+        usb/mouse/output_mouse.cpp
+        usb/mouse/output_mouse.h
+        usb/mouse/proxy_mouse.cpp
+        usb/mouse/proxy_mouse.h
+        usb/hid_device_identifer.h)
 
 target_link_libraries(core base usb-1.0 hid-rp libusbgx rga rknn CImg -lpthread)
