@@ -48,7 +48,7 @@ public:
 
     virtual void SetCoreIndex(int index) = 0;
 
-    virtual void Load(const std::string& model_path) = 0;
+    virtual void Load(std::span<u8> data) = 0;
 
     virtual void Apply() = 0;
 

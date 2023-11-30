@@ -5,7 +5,7 @@
 
 namespace aibox::model {
 
-YoloV6::YoloV6(const std::string& model_path) : Yolo(model_path) {
+YoloV6::YoloV6(std::span<u8> data) : Yolo(data) {
     score_sum_available = model->GetOutTensorCount() > 6;
     if (const u32 len = model->GetOutTensorInfo(0).shape[1]; len != 4) {
         dfl_len = model->GetOutTensorInfo(0).shape[1] / 4;

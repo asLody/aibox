@@ -5,7 +5,9 @@ TEST_CASE("Video::VideoCapture", "[core]") {
     aibox::video::VideoCapture video_capture;
     video_capture.Open();
     video_capture.StartStreaming();
-    const auto& buffer = video_capture.DequeueBuffer();
-    video_capture.RequeueBuffer(buffer.index);
+    const auto &buffers = video_capture.GetBuffers();
+    REQUIRE(buffers.size() == 3);
+    const auto index = video_capture.DequeueBuffer();
+    video_capture.RequeueBuffer(index);
     video_capture.StopStreaming();
 }

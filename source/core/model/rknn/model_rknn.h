@@ -15,7 +15,7 @@ public:
 
     void SetCoreIndex(int index) override;
 
-    void Load(const std::string& model_path) override;
+    void Load(std::span<u8> data) override;
 
     void Apply() override;
 

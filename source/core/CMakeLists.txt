@@ -41,6 +41,8 @@ add_library(core STATIC
         usb/hid_device_identifier.h
         video/video_capture.cpp
         video/video_capture.h
-        video/edid.h)
+        video/edid.h
+        aimbot/aimbot_fps.cpp
+        aimbot/aimbot_fps.h)
 
 target_link_libraries(core base usb-1.0 hid-rp libusbgx rga rknn CImg -lpthread)

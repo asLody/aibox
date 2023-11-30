@@ -139,7 +139,7 @@ void VideoCapture::QueueBuffers() const {
     }
 }
 
-const V4l2Buffer& VideoCapture::DequeueBuffer() {
+u32 VideoCapture::DequeueBuffer() const {
     v4l2_plane planes[VIDEO_MAX_PLANES]{};
     v4l2_buffer buffer{
             .type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE,
@@ -150,7 +150,7 @@ const V4l2Buffer& VideoCapture::DequeueBuffer() {
     if (ioctl(fd, VIDIOC_DQBUF, &buffer) < 0) {
         throw std::runtime_error("Could not dequeue buffer");
     }
-    return buffers[buffer.index];
+    return buffer.index;
 }
 
 void VideoCapture::RequeueBuffer(u32 index) const {

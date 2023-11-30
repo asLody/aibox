@@ -19,6 +19,7 @@
 #ifndef _RGA_IM2D_TYPE_H_
 #define _RGA_IM2D_TYPE_H_
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "rga.h"

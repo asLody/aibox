@@ -6,7 +6,7 @@
 
 namespace aibox::video {
 
-struct V4l2Buffer {
+struct VideoBuffer {
     u32 index;
     u8* buffer;
     u32 length;
@@ -18,7 +18,7 @@ public:
 
     void Open(s32 video_device_id = -1);
 
-    const V4l2Buffer& DequeueBuffer();
+    u32 DequeueBuffer() const;
 
     void RequeueBuffer(u32 index) const;
 
@@ -32,12 +32,14 @@ public:
 
     [[nodiscard]] u32 GetHeight() const { return height; }
 
+    [[nodiscard]] const std::vector<VideoBuffer>& GetBuffers() const { return buffers; }
+
 private:
     u32 buffer_count{3};
     int fd{-1};
     u32 format{};
     u32 width{}, height{};
-    std::vector<V4l2Buffer> buffers;
+    std::vector<VideoBuffer> buffers;
 
     static std::string StrPixelFormat(u32 pixel_format);
 

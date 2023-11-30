@@ -16,13 +16,13 @@ Model_RKNN::~Model_RKNN() {
     if (ctx) rknn_destroy(ctx);
 }
 
-void Model_RKNN::Load(const std::string& model_path) {
+void Model_RKNN::Load(std::span<u8> data) {
     const auto check_result = [](int ret, const char* msg) {
         if (ret == RKNN_SUCC) return;
         throw std::runtime_error(fmt::format("{}: {}", msg, ret));
     };
 
-    int ret = rknn_init(&ctx, (void*)model_path.c_str(), 0, 0, nullptr);
+    int ret = rknn_init(&ctx, data.data(), data.size_bytes(), 0, nullptr);
     check_result(ret, "Error loading model");
 
     rknn_input_output_num io_num;

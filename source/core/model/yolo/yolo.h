@@ -26,11 +26,13 @@ enum class YoloVersion : u32 {
 
 class Yolo {
 public:
-    explicit Yolo(const std::string& model_path);
+    explicit Yolo(std::span<u8> data);
 
-    static std::shared_ptr<Yolo> Create(YoloVersion version, const std::string& model_path);
+    static std::shared_ptr<Yolo> Create(YoloVersion version, std::span<u8> data);
 
     void SetThreshold(float val) { threshold = val; }
+
+    void SetCoreIndex(int index);
 
     void Detect(std::vector<Box>& boxes_out, std::span<u8> image);
 

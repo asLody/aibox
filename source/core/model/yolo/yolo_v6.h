@@ -11,7 +11,7 @@ namespace aibox::model {
 
 class YoloV6 : public Yolo {
 public:
-    explicit YoloV6(const std::string& model_path);
+    explicit YoloV6(std::span<u8> data);
 
 private:
     bool score_sum_available{};

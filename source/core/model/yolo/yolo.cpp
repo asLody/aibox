@@ -6,21 +6,23 @@
 
 namespace aibox::model {
 
-std::shared_ptr<Yolo> Yolo::Create(YoloVersion version, const std::string& model_path) {
+std::shared_ptr<Yolo> Yolo::Create(YoloVersion version, std::span<u8> data) {
     switch (version) {
         case YoloVersion::YoloV6:
-            return std::make_shared<YoloV6>(model_path);
+            return std::make_shared<YoloV6>(data);
         default:
             throw std::runtime_error("Unsupported Yolo version");
     }
 }
 
-Yolo::Yolo(const std::string& model_path) {
+Yolo::Yolo(std::span<u8> data) {
     model = Model::Create();
-    model->Load(model_path);
+    model->Load(data);
     model->SetInTensorType(0, TensorType::Uint8);
     model->Apply();
 }
+
+void Yolo::SetCoreIndex(int index) { model->SetCoreIndex(index); }
 
 float Yolo::CalculateOverlap(float xmin0,
                              float ymin0,
