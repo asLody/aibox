@@ -56,6 +56,9 @@ void MouseProtocol::Decode(MouseReport& report, std::span<u8> data) const {
 }
 
 void MouseProtocol::Encode(std::span<u8> data, const MouseReport& report) const {
+    if (report_id != 0) {
+        data[0] = report_id;
+    }
     const auto insert = [&](const std::optional<hid::Attributes>& attr, double value) {
         if (!attr) return;
         hid::InsertAsUnitType(data.data(), data.size(), *attr, value);

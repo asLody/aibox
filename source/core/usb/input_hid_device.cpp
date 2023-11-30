@@ -147,7 +147,7 @@ void InputHIDDevice::OpenUSB(libusb_device* dev,
         }
     }
 
-    descriptor.bcd_usb = desc->bcdDevice;
+    descriptor.bcd_usb = desc->bcdUSB;
     descriptor.device_subclass = desc->bDeviceSubClass;
     descriptor.device_protocol = desc->bDeviceProtocol;
     descriptor.max_packet_size0 = desc->bMaxPacketSize0;

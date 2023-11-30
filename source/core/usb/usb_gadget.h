@@ -21,6 +21,7 @@ public:
 
 private:
     const char* gadget_name = "aibox";
+    const char* default_serial = "0";
     usbg_state* u_state{};
     usbg_gadget* u_gadget{};
 

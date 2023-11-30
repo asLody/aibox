@@ -30,13 +30,13 @@ void UsbGadget::Configure(const HIDGadgetDescriptor& descriptor) {
 
 void UsbGadget::PrintDescriptor(const HIDGadgetDescriptor& descriptor) {
     LOG_INFO("Gadget descriptor:");
-    LOG_INFO("bcd_usb: {}", descriptor.bcd_usb);
+    LOG_INFO("bcd_usb: {:#x}", descriptor.bcd_usb);
     LOG_INFO("device_subclass: {}", descriptor.device_subclass);
     LOG_INFO("device_protocol: {}", descriptor.device_protocol);
     LOG_INFO("max_packet_size0: {}", descriptor.max_packet_size0);
-    LOG_INFO("vendor_id: {}", descriptor.vendor_id);
-    LOG_INFO("product_id: {}", descriptor.product_id);
-    LOG_INFO("bcd_device: {}", descriptor.bcd_device);
+    LOG_INFO("vendor_id: {:#x}", descriptor.vendor_id);
+    LOG_INFO("product_id: {:#x}", descriptor.product_id);
+    LOG_INFO("bcd_device: {:#x}", descriptor.bcd_device);
     LOG_INFO("manufacturer: {}", descriptor.manufacturer);
     LOG_INFO("product: {}", descriptor.product);
     LOG_INFO("serial: {}", descriptor.serial);
@@ -72,7 +72,8 @@ void UsbGadget::CreateGadget(const HIDGadgetDescriptor& descriptor) {
     struct usbg_gadget_strs g_strs = {
             .manufacturer = const_cast<char*>(descriptor.manufacturer.c_str()),
             .product = const_cast<char*>(descriptor.product.c_str()),
-            .serial = const_cast<char*>(descriptor.serial.c_str()),
+            .serial = const_cast<char*>(descriptor.serial.empty() ? default_serial
+                                                                  : descriptor.serial.c_str()),
     };
     struct usbg_config_strs c_strs = {
             .configuration = (char*)"config",
