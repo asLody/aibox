@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <usbg/usbg.h>
-#include "core/usb/hid_device_identifer.h"
+#include "core/usb/hid_device_identifier.h"
 #include "core/usb/hid_gadget_descriptor.h"
 
 namespace aibox::usb {

@@ -38,6 +38,9 @@ add_library(core STATIC
         usb/mouse/output_mouse.h
         usb/mouse/proxy_mouse.cpp
         usb/mouse/proxy_mouse.h
-        usb/hid_device_identifer.h)
+        usb/hid_device_identifier.h
+        video/video_capture.cpp
+        video/video_capture.h
+        video/edid.h)
 
 target_link_libraries(core base usb-1.0 hid-rp libusbgx rga rknn CImg -lpthread)
