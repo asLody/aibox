@@ -21,7 +21,7 @@ void Core::Run() {
     Setup();
     mouse->Open();
     gadget->Configure(mouse->GetDescriptor());
-    mouse->OpenOutput(0);
+    mouse->ConnectOutput(0);
     mouse->StartReadInput();
 }
 

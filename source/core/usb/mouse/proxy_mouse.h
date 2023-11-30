@@ -11,9 +11,9 @@ public:
 
     ~ProxyMouse() override;
 
-    void OpenOutput(u32 hid_number);
+    void ConnectOutput(u32 hid_number);
 
-    void SendReport(const MouseReport& report);
+    void Send(const MouseReport& report);
 
 protected:
     void InitProtocol() override;

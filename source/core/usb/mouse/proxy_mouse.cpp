@@ -11,11 +11,11 @@ void ProxyMouse::InitProtocol() {
     buffer.resize(descriptor.report_length);
 }
 
-void ProxyMouse::OpenOutput(u32 hid_number) { output.Open(hid_number); }
+void ProxyMouse::ConnectOutput(u32 hid_number) { output.Open(hid_number); }
 
 void ProxyMouse::HandleInput(u8* data, u32 length) { output.Write(data, length); }
 
-void ProxyMouse::SendReport(const MouseReport& report) {
+void ProxyMouse::Send(const MouseReport& report) {
     protocol.Encode(buffer, report);
     output.Write(buffer.data(), buffer.size());
 }
