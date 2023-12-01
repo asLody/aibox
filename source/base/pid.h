@@ -6,8 +6,8 @@ namespace base {
 
 class PID {
 public:
-    PID(float kp, float ki, float kd, float max, float min, float dt)
-            : kp(kp), ki(ki), kd(kd), max(max), min(min), dt(dt) {}
+    PID(float kp, float ki, float kd, float min, float max, float dt)
+            : kp(kp), ki(ki), kd(kd), min(min), max(max), dt(dt) {}
 
     float Update(float error);
 
@@ -16,13 +16,18 @@ public:
         pre_error = 0;
     }
 
+    void SetRange(float rang) {
+        min = -rang;
+        max = rang;
+    }
+
 private:
     const float dt;
-    const float max;
-    const float min;
     const float kp;
     const float ki;
     const float kd;
+    float max;
+    float min;
     float integral{};
     float pre_error{};
 };

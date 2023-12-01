@@ -26,7 +26,7 @@ void Yolo::SetCoreIndex(int index) { model->SetCoreIndex(index); }
 
 std::pair<u32, u32> Yolo::GetInputSize() const {
     const auto& image_shape = model->GetInTensorInfo(0).shape;
-    return {image_shape[0], image_shape[1]};
+    return {image_shape[1], image_shape[2]};
 }
 
 float Yolo::CalculateOverlap(float xmin0,
@@ -70,7 +70,7 @@ void Yolo::Detect(std::vector<Box>& boxes_out, std::span<u8> image) {
 
     PostProcess();
 
-    std::sort(boxes.begin(), boxes.end(), [this](const Box& b1, const Box& b2) {
+    std::sort(boxes.begin(), boxes.end(), [](const Box& b1, const Box& b2) {
         return b1.score > b2.score;
     });
     DoNonMaxSuppression();
@@ -82,7 +82,6 @@ void Yolo::Detect(std::vector<Box>& boxes_out, std::span<u8> image) {
         }
         boxes_out.push_back(box);
     }
-
     boxes.clear();
 }
 

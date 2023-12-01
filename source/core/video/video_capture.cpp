@@ -65,7 +65,7 @@ void VideoCapture::Setup() {
     if (get_format_command.fmt.pix_mp.pixelformat != V4L2_PIX_FMT_BGR24) {
         LOG_DEBUG("Current pixel format is not BGR24 (got {}), writing edid...",
                   StrPixelFormat(get_format_command.fmt.pix_mp.pixelformat));
-        WriteEDID(EDID_FORCE_GBR24, sizeof(EDID_FORCE_GBR24));
+        WriteEDID(EDID_FORCE_GBR24_60HZ, sizeof(EDID_FORCE_GBR24_60HZ));
     }
     if (ioctl(fd, VIDIOC_G_FMT, &get_format_command) < 0) {
         throw std::runtime_error("Could not query video device format");

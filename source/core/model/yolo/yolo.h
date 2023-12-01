@@ -9,7 +9,7 @@
 
 namespace aibox::model {
 
-constexpr size_t kYoloClassNum = 80;
+constexpr size_t kYoloClassNum = 1;
 
 struct Box {
     s32 class_id;
@@ -36,7 +36,7 @@ public:
 
     void Detect(std::vector<Box>& boxes_out, std::span<u8> image);
 
-    [[nodiscard]] std::pair<u32, u32> GetInputSize() const;
+    std::pair<u32, u32> GetInputSize() const;
 
 protected:
     float threshold{0.4f};
