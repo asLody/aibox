@@ -18,6 +18,8 @@ std::string VideoCapture::StrPixelFormat(u32 pixel_format) {
 
 VideoCapture::VideoCapture() = default;
 
+VideoCapture::~VideoCapture() { Close(); }
+
 void VideoCapture::Open(s32 video_device_id) {
     if (video_device_id >= 0) {
         fd = open(fmt::format("/dev/video{}", video_device_id).c_str(), O_RDWR);
@@ -188,6 +190,16 @@ void VideoCapture::WriteEDID(const u8* data, u32 len) const {
     v4l2_edid edid{.start_block = 0, .blocks = blocks, .edid = aligned_data.data()};
     if (ioctl(fd, VIDIOC_S_EDID, &edid) < 0) {
         throw std::runtime_error("Could not set EDID");
+    }
+}
+
+void VideoCapture::Close() {
+    if (fd >= 0) {
+        for (auto& buffer : buffers) {
+            munmap(buffer.buffer, buffer.length);
+        }
+        close(fd);
+        fd = -1;
     }
 }
 

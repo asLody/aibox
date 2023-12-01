@@ -36,6 +36,8 @@ public:
 
     void Detect(std::vector<Box>& boxes_out, std::span<u8> image);
 
+    [[nodiscard]] std::pair<u32, u32> GetInputSize() const;
+
 protected:
     float threshold{0.4f};
     float threshold_nms{0.45f};

@@ -16,7 +16,11 @@ class VideoCapture {
 public:
     VideoCapture();
 
+    ~VideoCapture();
+
     void Open(s32 video_device_id = -1);
+
+    void Close();
 
     u32 DequeueBuffer() const;
 

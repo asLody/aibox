@@ -24,6 +24,11 @@ Yolo::Yolo(std::span<u8> data) {
 
 void Yolo::SetCoreIndex(int index) { model->SetCoreIndex(index); }
 
+std::pair<u32, u32> Yolo::GetInputSize() const {
+    const auto& image_shape = model->GetInTensorInfo(0).shape;
+    return {image_shape[0], image_shape[1]};
+}
+
 float Yolo::CalculateOverlap(float xmin0,
                              float ymin0,
                              float xmax0,
