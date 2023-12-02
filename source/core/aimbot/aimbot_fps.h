@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include "base/fps_counter.h"
 #include "base/macros.h"
 #include "base/pid.h"

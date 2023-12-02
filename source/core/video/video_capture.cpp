@@ -1,5 +1,6 @@
 #include <dirent.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
