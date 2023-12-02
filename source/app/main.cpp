@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <stdexcept>
 #include <thread>
 #include "core/core.h"
