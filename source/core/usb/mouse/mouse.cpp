@@ -72,11 +72,11 @@ void MouseProtocol::Encode(std::span<u8> data, const MouseReport& report) const 
         hid::InsertAsUnitType(data.data(), data.size(), *attr, value);
     };
     if (is_absolute) {
-        insert(movement_x, report.x);
-        insert(movement_y, report.y);
-    } else {
         insert(position_x, report.x);
         insert(position_y, report.y);
+    } else {
+        insert(movement_x, report.x);
+        insert(movement_y, report.y);
     }
     insert(scroll_v, report.scroll);
     for (size_t i = 0; i < report.buttons.size(); i++) {
