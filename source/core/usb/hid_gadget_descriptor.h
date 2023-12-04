@@ -26,7 +26,6 @@ struct HIDGadgetDescriptor {
     u32 hid_subclass;
     hid::DeviceDescriptor* report_descriptor;
     std::vector<u8> report_descriptor_data;
-    u32 input_report_index;
     u16 report_length;
 
     ~HIDGadgetDescriptor();

@@ -4,36 +4,44 @@
 
 namespace aibox::usb {
 
-void MouseProtocol::ParseReportDescriptor(const hid::ReportDescriptor& descriptor) {
-    report_length = descriptor.input_byte_sz;
-    report_id = descriptor.report_id;
-
-    for (size_t j = 0; j < descriptor.input_count; j++) {
-        const hid::ReportField& field = descriptor.input_fields[j];
-        if (field.attr.usage ==
-            hid::USAGE(hid::usage::Page::kGenericDesktop, hid::usage::GenericDesktop::kX)) {
-            if (field.flags & hid::FieldTypeFlags::kAbsolute) {
-                position_x = field.attr;
-            } else {
-                movement_x = field.attr;
-            }
-        } else if (field.attr.usage ==
-                   hid::USAGE(hid::usage::Page::kGenericDesktop, hid::usage::GenericDesktop::kY)) {
-            if (field.flags & hid::FieldTypeFlags::kAbsolute) {
-                position_y = field.attr;
-            } else {
-                movement_y = field.attr;
-            }
-        } else if (field.attr.usage == hid::USAGE(hid::usage::Page::kGenericDesktop,
-                                                  hid::usage::GenericDesktop::kWheel)) {
-            scroll_v = field.attr;
-        } else if (field.attr.usage.page == hid::usage::Page::kButton) {
-            if (buttons.size() < kMaxMouseNumButtons) {
-                buttons.push_back(field.attr);
+void MouseProtocol::ParseReportDescriptor(const hid::DeviceDescriptor* descriptor) {
+    for (int i = 0; i < descriptor->rep_count; ++i) {
+        const auto& report = descriptor->report[i];
+        for (size_t j = 0; j < report.input_count; j++) {
+            const hid::ReportField& field = report.input_fields[j];
+            if (field.attr.usage ==
+                hid::USAGE(hid::usage::Page::kGenericDesktop, hid::usage::GenericDesktop::kX)) {
+                if (field.flags & hid::FieldTypeFlags::kAbsolute) {
+                    position_x = field.attr;
+                } else {
+                    movement_x = field.attr;
+                }
+            } else if (field.attr.usage == hid::USAGE(hid::usage::Page::kGenericDesktop,
+                                                      hid::usage::GenericDesktop::kY)) {
+                if (field.flags & hid::FieldTypeFlags::kAbsolute) {
+                    position_y = field.attr;
+                } else {
+                    movement_y = field.attr;
+                }
+            } else if (field.attr.usage == hid::USAGE(hid::usage::Page::kGenericDesktop,
+                                                      hid::usage::GenericDesktop::kWheel)) {
+                scroll_v = field.attr;
+            } else if (field.attr.usage.page == hid::usage::Page::kButton) {
+                if (buttons.size() < kMaxMouseNumButtons) {
+                    buttons.push_back(field.attr);
+                }
             }
         }
+        if (position_x || movement_x) {
+            is_absolute = position_x.has_value();
+            hid_report_length = report.input_byte_sz;
+            hid_report_id = report.report_id;
+            break;
+        }
     }
-    is_absolute = movement_x.has_value();
+    if (!position_x && !movement_x) {
+        throw std::runtime_error("MouseProtocol: no input found");
+    }
 }
 
 void MouseProtocol::Decode(MouseReport& report, std::span<u8> data) const {
@@ -42,11 +50,11 @@ void MouseProtocol::Decode(MouseReport& report, std::span<u8> data) const {
         hid::ExtractAsUnitType(data.data(), data.size(), *attr, value);
     };
     if (is_absolute) {
-        extract(movement_x, &report.x);
-        extract(movement_y, &report.y);
-    } else {
         extract(position_x, &report.x);
         extract(position_y, &report.y);
+    } else {
+        extract(movement_x, &report.x);
+        extract(movement_y, &report.y);
     }
     extract(scroll_v, &report.scroll);
     report.buttons.resize(buttons.size());
@@ -56,8 +64,8 @@ void MouseProtocol::Decode(MouseReport& report, std::span<u8> data) const {
 }
 
 void MouseProtocol::Encode(std::span<u8> data, const MouseReport& report) const {
-    if (report_id != 0) {
-        data[0] = report_id;
+    if (hid_report_id != 0) {
+        data[0] = hid_report_id;
     }
     const auto insert = [&](const std::optional<hid::Attributes>& attr, double value) {
         if (!attr) return;

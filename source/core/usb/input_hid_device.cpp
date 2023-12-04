@@ -193,21 +193,16 @@ void InputHIDDevice::OpenUSB(libusb_device* dev,
     if (parse_res != hid::kParseOk)
         throw std::runtime_error("Error parsing USB device report descriptor");
 
-    s32 input_report_index = -1;
+    u32 report_length = 0;
     for (int i = 0; i < descriptor.report_descriptor->rep_count; ++i) {
-        if (descriptor.report_descriptor->report[i].input_byte_sz > 0) {
-            if (input_report_index != -1) {
-                throw std::runtime_error("USB device report descriptor has multiple input reports");
-            }
-            input_report_index = i;
+        if (descriptor.report_descriptor->report[i].input_byte_sz > report_length) {
+            report_length = descriptor.report_descriptor->report[i].input_byte_sz;
         }
     }
-    if (input_report_index < 0) {
+    if (report_length == 0) {
         throw std::runtime_error("USB device report descriptor has no input reports");
     }
-    descriptor.input_report_index = input_report_index;
-    descriptor.report_length =
-            descriptor.report_descriptor->report[input_report_index].input_byte_sz;
+    descriptor.report_length = report_length;
     InitProtocol();
 }
 

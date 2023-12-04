@@ -1,3 +1,4 @@
+#include "base/file_utils.h"
 #include "core/usb/mouse/input_mouse.h"
 
 namespace aibox::usb {
@@ -14,8 +15,8 @@ bool InputMouse::MatchInterfaceDescriptor(const libusb_interface_descriptor* int
 }
 
 void InputMouse::InitProtocol() {
-    const auto& desc = descriptor.report_descriptor;
-    protocol.ParseReportDescriptor(desc->report[descriptor.input_report_index]);
+    protocol.ParseReportDescriptor(descriptor.report_descriptor);
+    descriptor.report_length = protocol.GetHIDReportLength();
 }
 
 }  // namespace aibox::usb

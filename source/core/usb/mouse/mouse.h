@@ -24,22 +24,22 @@ class MouseProtocol {
 public:
     MouseProtocol() = default;
 
-    void ParseReportDescriptor(const hid::ReportDescriptor& descriptor);
+    void ParseReportDescriptor(const hid::DeviceDescriptor* descriptor);
 
     void Decode(MouseReport& report, std::span<u8> data) const;
 
     void Encode(std::span<u8> data, const MouseReport& report) const;
 
-    [[nodiscard]] u32 GetReportLength() const { return report_length; }
+    [[nodiscard]] u8 GetHIDReportID() const { return hid_report_id; }
 
-    [[nodiscard]] u8 GetReportID() const { return report_id; }
+    [[nodiscard]] u32 GetHIDReportLength() const { return hid_report_length; }
 
     [[nodiscard]] u32 GetButtonUsage(u32 index) const { return buttons[index].usage.usage; }
 
 private:
     bool is_absolute{};
-    u8 report_id{};
-    u32 report_length{};
+    u8 hid_report_id{};
+    u32 hid_report_length{};
     std::optional<hid::Attributes> movement_x;
     std::optional<hid::Attributes> movement_y;
     std::optional<hid::Attributes> position_x;
